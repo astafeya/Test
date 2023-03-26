@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -110,45 +111,33 @@ namespace Serialization
         {
             AddLine(s, Count.ToString());
             if (Count == 0) return;
+            Dictionary<ListNode, int> dict = new Dictionary<ListNode, int>();
             ListNode current = Head;
-            do 
+            for (int i = 0; i < Count; i++)
+            {
+                dict.Add(current, i);
+                current = current.Next;
+            }
+            current = Head;
+            for (int i = 0; i < Count; i++)
             {
                 AddLine(s, "\n");
                 AddLine(s, current.Data);
                 AddLine(s, "\n");
 
-                string rand = null;
+                string rand;
                 if (current.Rand == null)
                     rand = "null";
                 else if (current.Rand == current)
-                        rand = "self";
-                else
+                    rand = "self";
+                else 
                 {
-                    int h = 0;
-                    int t = Count - 1;
-                    ListNode hNode = Head;
-                    ListNode tNode = Tail;
-                    do
-                    {
-                        if (current.Rand == hNode)
-                        {
-                            rand = h.ToString();
-                            break;
-                        } else if (current.Rand == tNode)
-                        {
-                            rand = t.ToString();
-                            break;
-                        }
-                        h++;
-                        t--;
-                        hNode = hNode.Next;
-                        tNode = tNode.Prev;
-                    } while (rand == null && h <= t);
+                    dict.TryGetValue(current.Rand, out int r);
+                    rand = r.ToString();
                 }
                 AddLine(s, rand);
-
                 current = current.Next;
-            } while (current != null);
+            }
         }
 
         public void Deserialize(FileStream s)
@@ -179,7 +168,7 @@ namespace Serialization
                 }
             }
             Head = listNodes[0];
-            Tail = listNodes[Count = 1];
+            Tail = listNodes[Count - 1];
         }
 
         private void AddLine(FileStream s, string text)
